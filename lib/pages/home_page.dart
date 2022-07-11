@@ -1,41 +1,31 @@
 import 'package:budget_tracker/model/transaction_item.dart';
-import 'package:budget_tracker/services/budget_service.dart';
+import 'package:budget_tracker/view_models/budget_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-
-  List<TransactionItem> items = [];
+  // List<TransactionItem> items = [];
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final budgetService = Provider.of<BudgetService>(context);
+    // print("Home Page");
     
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // setState(() {
-          //   items.add(TransactionItem(amount: 5.99, itemTitle: "Food"));
-          // });
-
           showDialog(
             context: context,
             builder: (context){
               return AddTransactionDialog(
                   itemToAdd: (transactionItem){
-                    setState(() {
-                      items.add(transactionItem);
-                    });
-
+                    final budgetService = Provider.of<BudgetViewModel>(context, listen: false);
+                    budgetService.addItem(transactionItem);
+                    // setState(() {
+                    // items.add(transactionItem);
+                    // });
                   },
               );
             } 
@@ -53,18 +43,30 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Align(
                   alignment: Alignment.topCenter,
-                  child: Consumer<BudgetService>(                    builder: ((context, value, child) {
+                  child: Consumer<BudgetViewModel>(                    
+                    builder: ((context, value, child) {
+                      final balance = value.getBalance();
+                      final budget = value.getBudget();
+                      double percentage = balance / budget;
+
+                      if(percentage < 0){
+                        percentage = 0;
+                      }
+                      if(percentage > 1){
+                        percentage = 1;
+                      }
+
                       return CircularPercentIndicator(
                         radius: screenSize.width / 2,
                         lineWidth: 10.0,
-                        percent: 0.7,
+                        percent: percentage,
                         backgroundColor: Colors.white,
                         progressColor: Theme.of(context).colorScheme.primary,
                         center: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "\$0",
+                              "\$" + balance.toString().split('.')[0],
                               style: const TextStyle(
                                 fontSize: 48,
                                 fontWeight: FontWeight.bold,
@@ -74,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                             const Text("Balance", style: TextStyle(fontSize: 18)),
                   
                              Text(
-                              "Budget: \$" + value.budget.truncate().toString(),
+                              "Budget: \$" + budget.toString().split('.')[0],
                               style: const TextStyle(
                                 fontSize: 10,
                               ),
@@ -95,49 +97,57 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(
                   height: 10,
                 ),
-    
-                ...List<TransactionCard>.generate(
-                  items.length,
-                  (index) => TransactionCard(
-                    item: items[index],
-                    ),
+                
+                Consumer<BudgetViewModel>(
+                  builder: ((context, value, child) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: value.items.length,
+                      itemBuilder: (context, index){
+                        return TransactionCard(
+                          item: value.items[index],
+                        );
+                      },
+                    );
+                  })
                 ),
     
-                TransactionCard(
-                  item: TransactionItem(
-                    itemTitle: "Apple Watch", amount: 105.99, isExpense: false
-                  ),
-                ),
+
+                // TransactionCard(
+                //   item: TransactionItem(
+                //     itemTitle: "Apple Watch", amount: 105.99, isExpense: false
+                //   ),
+                // ),
     
-                TransactionCard(
-                  item: TransactionItem(
-                    itemTitle: "Apple iPhone", amount: 800,
-                  ),
-                ),
+                // TransactionCard(
+                //   item: TransactionItem(
+                //     itemTitle: "Apple iPhone", amount: 800,
+                //   ),
+                // ),
     
-                TransactionCard(
-                  item: TransactionItem(
-                    itemTitle: "Apple Earbuds", amount: 5.99, isExpense: false
-                  ),
-                ),
+                // TransactionCard(
+                //   item: TransactionItem(
+                //     itemTitle: "Apple Earbuds", amount: 5.99, isExpense: false
+                //   ),
+                // ),
     
-                TransactionCard(
-                  item: TransactionItem(
-                    itemTitle: "Apple Charger", amount: 5.99, isExpense: true
-                  ),
-                ),
+                // TransactionCard(
+                //   item: TransactionItem(
+                //     itemTitle: "Apple Charger", amount: 5.99, isExpense: true
+                //   ),
+                // ),
     
-                TransactionCard(
-                  item: TransactionItem(
-                    itemTitle: "Apple Shirt", amount: 5.99, isExpense: true
-                  ),
-                ),
+                // TransactionCard(
+                //   item: TransactionItem(
+                //     itemTitle: "Apple Shirt", amount: 5.99, isExpense: true
+                //   ),
+                // ),
     
-                TransactionCard(
-                  item: TransactionItem(
-                    itemTitle: "Apple Eyes", amount: 5.99, isExpense: true
-                  ),
-                ),
+                // TransactionCard(
+                //   item: TransactionItem(
+                //     itemTitle: "Apple Eyes", amount: 5.99, isExpense: true
+                //   ),
+                // ),
               ],
             ),
           ),
