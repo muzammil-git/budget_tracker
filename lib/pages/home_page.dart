@@ -1,6 +1,8 @@
 import 'package:budget_tracker/model/transaction_item.dart';
+import 'package:budget_tracker/services/budget_service.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,6 +18,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final budgetService = Provider.of<BudgetService>(context);
+    
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -49,25 +53,36 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Align(
                   alignment: Alignment.topCenter,
-                  child: CircularPercentIndicator(
-                    radius: screenSize.width / 2,
-                    lineWidth: 10.0,
-                    percent: 0.7,
-                    backgroundColor: Colors.white,
-                    progressColor: Theme.of(context).colorScheme.primary,
-                    center: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          "\$0",
-                          style: TextStyle(
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  child: Consumer<BudgetService>(                    builder: ((context, value, child) {
+                      return CircularPercentIndicator(
+                        radius: screenSize.width / 2,
+                        lineWidth: 10.0,
+                        percent: 0.7,
+                        backgroundColor: Colors.white,
+                        progressColor: Theme.of(context).colorScheme.primary,
+                        center: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "\$0",
+                              style: const TextStyle(
+                                fontSize: 48,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            
+                            const Text("Balance", style: TextStyle(fontSize: 18)),
+                  
+                             Text(
+                              "Budget: \$" + value.budget.truncate().toString(),
+                              style: const TextStyle(
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text("Balance", style: TextStyle(fontSize: 18)),
-                      ],
-                    ),
+                      );
+                    })
                   ),
                 ),
                 const SizedBox(
