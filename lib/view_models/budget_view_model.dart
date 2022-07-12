@@ -1,6 +1,6 @@
 
 import 'package:budget_tracker/model/transaction_item.dart';
-import 'package:budget_tracker/services/Local_storage_service.dart';
+import 'package:budget_tracker/services/local_storage_service.dart';
 import 'package:flutter/foundation.dart';
 
 class BudgetViewModel extends ChangeNotifier {
@@ -10,6 +10,7 @@ class BudgetViewModel extends ChangeNotifier {
   double getBalance() => LocalStorageService().getBalance();
 
   List<TransactionItem> get items => LocalStorageService().getAllTransactions();
+
 
   set budget(double value){
     LocalStorageService().saveBudget(value);
@@ -21,6 +22,12 @@ class BudgetViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void deleteItem(TransactionItem item){
+            
+    LocalStorageService().deleteTransactionItem(item);
+    // LocalStorageService().saveBalanceOnDelete(item);
+    notifyListeners();
+  }
   
   
 

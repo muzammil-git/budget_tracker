@@ -49,7 +49,7 @@ class _HomeState extends State<Home> {
                         );
                         budgetService.budget = budget;
 
-                        print(budget);
+                        // print(budget);
                       },
                     );
                   },

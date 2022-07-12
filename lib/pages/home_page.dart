@@ -1,4 +1,5 @@
 import 'package:budget_tracker/model/transaction_item.dart';
+import 'package:budget_tracker/services/local_storage_service.dart';
 import 'package:budget_tracker/view_models/budget_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -19,13 +20,11 @@ class HomePage extends StatelessWidget {
           showDialog(
             context: context,
             builder: (context){
+
               return AddTransactionDialog(
                   itemToAdd: (transactionItem){
                     final budgetService = Provider.of<BudgetViewModel>(context, listen: false);
                     budgetService.addItem(transactionItem);
-                    // setState(() {
-                    // items.add(transactionItem);
-                    // });
                   },
               );
             } 
@@ -225,6 +224,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
               ElevatedButton(
                 onPressed: (){
+
                   if(itemTitleController.text.isNotEmpty &&
                     amountController.text.isNotEmpty){
                       widget.itemToAdd(
@@ -260,35 +260,74 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(15),
-      margin: const EdgeInsets.symmetric(vertical: 05),
-      decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
-          borderRadius: const BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              offset: const Offset(0, 25),
-              blurRadius: 50,
+    return GestureDetector(
+      onTap: (){
+        showDialog(
+          context: context,
+          builder: (context){
+            return Dialog(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Delete Item"),
+                    Spacer(),
+                    TextButton(
+                      onPressed: (){
+                        final budgetViewModel = Provider.of<BudgetViewModel>(
+                          context,
+                          listen: false);
+                        budgetViewModel.deleteItem(item);
+                        Navigator.pop(context);
+                      },
+                      child: Text("Yes"),
+                    ),
+
+                    TextButton(
+                      onPressed: (){
+                        Navigator.pop(context);
+                      },
+                      child: Text("No"),
+                    )
+                  ]
+                ),
+              ),
+            );
+          }
+          
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(15),
+        margin: const EdgeInsets.symmetric(vertical: 05),
+        decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.background,
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                offset: const Offset(0, 25),
+                blurRadius: 50,
+              )
+            ]),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "${item.itemTitle}",
+              style: const TextStyle(
+                fontSize: 18,
+              ),
+            ),
+            Text(
+              (item.isExpense ? "-" : "+") + " ${item.amount}",
+              style: const TextStyle(
+                fontSize: 16,
+              ),
             )
-          ]),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "${item.itemTitle}",
-            style: const TextStyle(
-              fontSize: 18,
-            ),
-          ),
-          Text(
-            (item.isExpense ? "-" : "+") + " ${item.amount}",
-            style: const TextStyle(
-              fontSize: 16,
-            ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
