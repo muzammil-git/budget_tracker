@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         builder:(BuildContext context ){
           final themeService = Provider.of<ThemeService>(context);
           return MaterialApp(
-            title: 'Fludtter Demo', 
+            title: 'Flutter Demo', 
             theme: ThemeData(
               // primarySwatch: Colors.red,
               colorScheme: ColorScheme.fromSeed(
